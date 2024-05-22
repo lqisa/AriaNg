@@ -298,7 +298,8 @@
             }, true);
         };
 
-        $scope.removeTasks = function (silent = false) {
+        $scope.removeTasks = function (silent) {
+            var _silent = !(silent === undefined);
             var tasks = $rootScope.taskContext.getSelectedTasks();
 
             if (!tasks || tasks.length < 1) {
@@ -327,7 +328,7 @@
                 }, (tasks.length > 1));
             };
 
-            if (!silent && ariaNgSettingService.getConfirmTaskRemoval()) {
+            if (!_silent && ariaNgSettingService.getConfirmTaskRemoval()) {
                 ariaNgCommonService.confirm('Confirm Remove', 'Are you sure you want to remove the selected task?', 'warning', removeTasks);
             } else {
                 removeTasks();
