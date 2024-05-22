@@ -207,6 +207,7 @@
                     var actionAfterRetryingTask = ariaNgSettingService.getAfterRetryingTask();
 
                     if (response.success && response.data) {
+                        $scope.removeTasks(true);
                         if (actionAfterRetryingTask === 'task-list-downloading') {
                             if ($location.path() !== '/downloading') {
                                 $location.path('/downloading');
@@ -275,6 +276,7 @@
                         var actionAfterRetryingTask = ariaNgSettingService.getAfterRetryingTask();
 
                         if (response.hasSuccess) {
+                            $scope.removeTasks(true);
                             if (actionAfterRetryingTask === 'task-list-downloading') {
                                 if ($location.path() !== '/downloading') {
                                     $location.path('/downloading');
@@ -296,7 +298,7 @@
             }, true);
         };
 
-        $scope.removeTasks = function () {
+        $scope.removeTasks = function (silent = false) {
             var tasks = $rootScope.taskContext.getSelectedTasks();
 
             if (!tasks || tasks.length < 1) {
@@ -325,7 +327,7 @@
                 }, (tasks.length > 1));
             };
 
-            if (ariaNgSettingService.getConfirmTaskRemoval()) {
+            if (!silent && ariaNgSettingService.getConfirmTaskRemoval()) {
                 ariaNgCommonService.confirm('Confirm Remove', 'Are you sure you want to remove the selected task?', 'warning', removeTasks);
             } else {
                 removeTasks();
@@ -334,19 +336,8 @@
 
         $scope.clearStoppedTasks = function () {
             ariaNgCommonService.confirm('Confirm Clear', 'Are you sure you want to clear stopped tasks?', 'warning', function () {
-                $rootScope.loadPromise = aria2TaskService.clearStoppedTasks(function (response) {
-                    if (!response.success) {
-                        return;
-                    }
-
-                    refreshGlobalStat(true);
-
-                    if ($location.path() !== '/stopped') {
-                        $location.path('/stopped');
-                    } else {
-                        $route.reload();
-                    }
-                });
+                $rootScope.taskContext.selectAllCompleted();
+                $scope.removeTasks(true);
             });
         };
 
